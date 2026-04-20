@@ -223,6 +223,29 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .sort-btn:hover,.sort-btn.active{background:var(--bg4);color:var(--text)}
 .edit-form{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:14px}
 .btn-blue{background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--blue)}
+
+/* CUOTA ALIMENTARIA */
+.ca-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.ca-table{width:100%;border-collapse:collapse;font-size:12px}
+.ca-table th{padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap}
+.ca-table th:first-child{text-align:left}
+.ca-table td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.ca-table td:not(:first-child){text-align:right}
+.ca-table tr:last-child td{border-bottom:none}
+.ca-table tr:hover td{background:var(--bg3)}
+.ca-input{width:120px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:5px 8px;font-size:12px;color:var(--text);font-family:'DM Mono',monospace;text-align:right}
+.ca-input:focus{outline:none;border-color:var(--blue)}
+.ca-diff.pos{color:var(--red);font-weight:600}
+.ca-diff.neg{color:var(--green);font-weight:600}
+.ca-diff.zero{color:var(--text3)}
+.ca-year-header{background:var(--bg3);font-weight:600;font-size:12px;color:var(--text)}
+.ca-badge{display:inline-block;font-size:9px;padding:2px 6px;border-radius:8px;font-weight:600;vertical-align:middle}
+.ca-badge.paid{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.ca-badge.partial{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+.ca-badge.pending{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.ca-badge.future{background:var(--bg4);color:var(--text3);border:1px solid var(--border)}
+.ca-extra-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
+.ca-extra-row:last-child{border-bottom:none}
 </style>
 </head>
 <body>
@@ -238,6 +261,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="nav-item" onclick="showPage('deudas',this)"><span class="nav-icon">◎</span>Deudas</div>
   <div class="nav-item" onclick="showPage('ahorros',this)"><span class="nav-icon">◆</span>Ahorros</div>
   <div class="nav-item" onclick="showPage('fx',this)"><span class="nav-icon">⇄</span>COP / CAD</div>
+  <div class="nav-item" onclick="showPage('cuota',this)"><span class="nav-icon">♡</span>Cuota alimentaria</div>
   <div class="nav-section">Config</div>
   <div class="nav-item" onclick="showPage('history',this)"><span class="nav-icon">≡</span>Historial</div>
   <div class="nav-item" onclick="showPage('budget',this)"><span class="nav-icon">◉</span>Presupuesto</div>
@@ -275,7 +299,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </div>
     <div class="metric">
       <div class="metric-label">Balance</div>
-      <div class="metric-val" id="d-balance">$0</div>
+      <div class="metric-val" id="debt-balance">$0</div>
       <div class="metric-sub" id="d-balance-cad"></div>
     </div>
     <div class="metric">
@@ -463,21 +487,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="card" style="max-width:640px;margin-bottom:18px">
     <div class="card-title">Agregar deuda</div>
     <div class="form-grid form-grid-2">
-      <div class="field"><label>Nombre</label><input id="d-name" type="text" placeholder="Ej: TC Nu, Hipoteca..."></div>
+      <div class="field"><label>Nombre</label><input id="debt-name" type="text" placeholder="Ej: TC Nu, Hipoteca..."></div>
       <div class="field"><label>Tipo</label>
-        <select id="d-type"><option>Tarjeta de crédito</option><option>Crédito de consumo</option><option>Hipoteca</option><option>Libre inversión</option><option>Leasing</option><option>Deuda personal</option><option>Otro</option></select>
+        <select id="debt-type"><option>Tarjeta de crédito</option><option>Crédito de consumo</option><option>Hipoteca</option><option>Libre inversión</option><option>Leasing</option><option>Deuda personal</option><option>Otro</option></select>
       </div>
     </div>
     <div class="form-grid form-grid-3">
       <div class="field"><label>Saldo total (COP)</label><input id="d-balance" type="number" placeholder="0"></div>
-      <div class="field"><label>Cuota mensual (COP)</label><input id="d-quota" type="number" placeholder="0"></div>
-      <div class="field"><label>Tasa (% E.A.)</label><input id="d-rate" type="number" placeholder="0" step="0.1"></div>
+      <div class="field"><label>Cuota mensual (COP)</label><input id="debt-quota" type="number" placeholder="0"></div>
+      <div class="field"><label>Tasa (% E.A.)</label><input id="debt-rate" type="number" placeholder="0" step="0.1"></div>
     </div>
     <div class="form-grid form-grid-2">
-      <div class="field"><label>Próximo pago</label><input id="d-duedate" type="date"></div>
-      <div class="field"><label>Cuotas restantes</label><input id="d-installments" type="number" placeholder="24"></div>
+      <div class="field"><label>Próximo pago</label><input id="debt-duedate" type="date"></div>
+      <div class="field"><label>Cuotas restantes</label><input id="debt-installments" type="number" placeholder="24"></div>
     </div>
-    <div class="field" style="margin-bottom:14px"><label>Nota</label><textarea id="d-note" placeholder="Banco, condiciones..."></textarea></div>
+    <div class="field" style="margin-bottom:14px"><label>Nota</label><textarea id="debt-note" placeholder="Banco, condiciones..."></textarea></div>
     <button class="btn btn-green" onclick="addDebt()">Guardar deuda</button>
     <span class="save-msg" id="debt-save-msg"></span>
   </div>
@@ -616,6 +640,101 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </div>
 
 
+
+<!-- CUOTA ALIMENTARIA -->
+<div class="content" id="page-cuota">
+  <div id="ca-metrics" class="ca-grid"></div>
+
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start">
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+          <div class="card-title" style="margin-bottom:0">Historial de cuotas — 2020 a la fecha</div>
+          <button class="btn btn-teal btn-sm" onclick="downloadCuotaCSV()">↓ Descargar</button>
+          <button class="btn btn-ghost btn-sm" onclick="downloadCuotaTemplate()">↓ Template CSV</button>
+          <label class="btn btn-blue btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:5px">
+            ↑ Importar CSV <input type="file" id="ca-import-file" accept=".csv" style="display:none" onchange="importCuotaCSV(this)">
+          </label>
+          <div id="ca-import-msg" style="font-size:12px;margin-top:4px"></div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="ca-table" id="ca-main-table">
+            <thead>
+              <tr>
+                <th style="text-align:left;min-width:110px">Mes</th>
+                <th>Cuota esperada</th>
+                <th>Recibido</th>
+                <th>Diferencia</th>
+                <th>Estado</th>
+                <th style="text-align:left">Nota</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="ca-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card">
+        <div class="card-title">Registrar pago recibido</div>
+        <div class="field" style="margin-bottom:10px">
+          <label>Mes</label>
+          <select id="ca-sel-month" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;color:var(--text)"></select>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label>Valor recibido (COP)</label>
+          <input id="ca-received" type="number" placeholder="0" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;color:var(--text);font-family:'DM Mono',monospace">
+        </div>
+        <div class="field" style="margin-bottom:12px">
+          <label>Nota</label>
+          <textarea id="ca-note" placeholder="Ej: Transferencia Bancolombia, efectivo..." style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;color:var(--text);min-height:50px;resize:vertical;font-family:'DM Sans',sans-serif"></textarea>
+        </div>
+        <button class="btn btn-green" style="width:100%" onclick="saveCuotaPayment()">Guardar pago</button>
+        <span class="save-msg" id="ca-save-msg"></span>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Gastos extras del menor</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Ropa, medicamentos, actividades, etc.</div>
+        <div class="field" style="margin-bottom:8px">
+          <label>Mes</label>
+          <select id="ca-extra-month" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 9px;font-size:12px;color:var(--text)"></select>
+        </div>
+        <div class="field" style="margin-bottom:8px">
+          <label>Concepto</label>
+          <input id="ca-extra-desc" type="text" placeholder="Ej: Ropa escolar, Medicamentos..." style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 9px;font-size:12px;color:var(--text)">
+        </div>
+        <div class="form-grid form-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div class="field">
+            <label>Categoría</label>
+            <select id="ca-extra-cat" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 9px;font-size:12px;color:var(--text)">
+              <option>Ropa</option><option>Medicamentos</option><option>Útiles escolares</option>
+              <option>Actividades</option><option>Salud</option><option>Alimentación</option>
+              <option>Transporte</option><option>Recreación</option><option>Otro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Valor (COP)</label>
+            <input id="ca-extra-val" type="number" placeholder="0" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 9px;font-size:12px;color:var(--text);font-family:'DM Mono',monospace">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label>¿Pagado por el padre?</label>
+          <select id="ca-extra-paid" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 9px;font-size:12px;color:var(--text)">
+            <option value="no">No — pendiente</option>
+            <option value="si">Sí — pagado</option>
+          </select>
+        </div>
+        <button class="btn btn-green" style="width:100%" onclick="saveCuotaExtra()">Agregar gasto extra</button>
+        <span class="save-msg" id="ca-extra-msg"></span>
+        <div style="margin-top:14px" id="ca-extras-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModalIfOverlay(event)">
   <div class="modal" id="modal-box">
@@ -630,7 +749,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </div><!-- /main -->
 </div><!-- /shell -->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+
 
 // ── SORT ──
 let sortField='date', sortDir=-1;
@@ -671,18 +792,18 @@ function editTx(id){
 function saveEdit(){
   const arr=getTx(),idx=arr.findIndex(x=>x.id===editingId);if(idx<0)return;
   const t=arr[idx];
-  const newAmt=+document.getElementById('edit-amount').value;
-  const newCurr=document.getElementById('edit-currency').value;
+  const newAmt=+document.getElementById('em-amount').value;
+  const newCurr=document.getElementById('em-currency').value;
   if(t.type==='expense'){
-    t.desc=document.getElementById('edit-desc').value.trim()||t.desc;
-    t.cat=document.getElementById('edit-cat').value;
-    t.pay=document.getElementById('edit-pay').value;
+    t.desc=document.getElementById('em-desc').value.trim()||t.desc;
+    t.cat=document.getElementById('em-cat').value;
+    t.pay=document.getElementById('em-pay').value;
   }else if(t.type==='income'){
-    t.source=document.getElementById('edit-source').value;t.dest=document.getElementById('edit-dest').value;t.desc=t.source;
+    t.source=document.getElementById('em-source').value;t.dest=document.getElementById('em-dest').value;t.desc=t.source;
   }
   if(newAmt){t.amountOrig=newAmt;t.currency=newCurr;t.amount=toCOP(newAmt,newCurr);}
-  t.date=document.getElementById('edit-date').value||t.date;
-  t.note=document.getElementById('edit-note').value;
+  t.date=document.getElementById('em-date').value||t.date;
+  t.note=document.getElementById('em-note').value;
   saveTx(arr);editingId=null;closeModal();renderAll();
 }
 
@@ -835,6 +956,358 @@ function resortExpModal(){
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');editingId=null;}
 function closeModalIfOverlay(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
 
+
+// ════════════════════════════════
+// CUOTA ALIMENTARIA
+// ════════════════════════════════
+const CA_MONTHS = [
+  '2020-01','2020-02','2020-03','2020-04','2020-05','2020-06','2020-07','2020-08','2020-09','2020-10','2020-11','2020-12',
+  '2021-01','2021-02','2021-03','2021-04','2021-05','2021-06','2021-07','2021-08','2021-09','2021-10','2021-11','2021-12',
+  '2022-01','2022-02','2022-03','2022-04','2022-05','2022-06','2022-07','2022-08','2022-09','2022-10','2022-11','2022-12',
+  '2023-01','2023-02','2023-03','2023-04','2023-05','2023-06','2023-07','2023-08','2023-09','2023-10','2023-11','2023-12',
+  '2024-01','2024-02','2024-03','2024-04','2024-05','2024-06','2024-07','2024-08','2024-09','2024-10','2024-11','2024-12',
+  '2025-08','2025-09','2025-10','2025-11','2025-12',
+  '2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'
+];
+
+// Cuota esperada por periodo
+function getCuotaEsperada(monthKey) {
+  const [y, m] = monthKey.split('-').map(Number);
+  if (y === 2025 && m >= 8) return 1150000;
+  if (y === 2026) return 1414000;
+  return 0; // años anteriores: sin cuota fija definida (se puede editar)
+}
+
+function getCuotaData() { return gls('fcuota') || {}; }
+function saveCuotaData(d) { sls('fcuota', d); }
+function getCuotaExtras() { return gls('fcuota_extras') || []; }
+function saveCuotaExtras(a) { sls('fcuota_extras', a); }
+
+function fmtMonth(k) {
+  const [y, m] = k.split('-');
+  return MONTHS[parseInt(m) - 1] + ' ' + y;
+}
+
+function populateCuotaSelects() {
+  const opts = CA_MONTHS.map(k => `<option value="${k}">${fmtMonth(k)}</option>`).reverse().join('');
+  document.getElementById('ca-sel-month').innerHTML = opts;
+  document.getElementById('ca-extra-month').innerHTML = opts;
+  // default to current month if in list
+  const cur = mkey(now.getFullYear(), now.getMonth());
+  if (CA_MONTHS.includes(cur)) {
+    document.getElementById('ca-sel-month').value = cur;
+    document.getElementById('ca-extra-month').value = cur;
+  }
+}
+
+function saveCuotaPayment() {
+  const month = document.getElementById('ca-sel-month').value;
+  const received = +document.getElementById('ca-received').value;
+  const note = document.getElementById('ca-note').value.trim();
+  if (!month) { alert('Selecciona un mes'); return; }
+  const d = getCuotaData();
+  if (!d[month]) d[month] = { expected: getCuotaEsperada(month), received: 0, note: '' };
+  if (received > 0) d[month].received = received;
+  if (note) d[month].note = note;
+  saveCuotaData(d);
+  document.getElementById('ca-received').value = '';
+  document.getElementById('ca-note').value = '';
+  const msg = document.getElementById('ca-save-msg');
+  msg.textContent = '✓ Guardado'; setTimeout(() => msg.textContent = '', 2000);
+  renderCuotaPage();
+}
+
+function saveCuotaExtra() {
+  const month = document.getElementById('ca-extra-month').value;
+  const desc = document.getElementById('ca-extra-desc').value.trim();
+  const cat = document.getElementById('ca-extra-cat').value;
+  const val = +document.getElementById('ca-extra-val').value;
+  const paid = document.getElementById('ca-extra-paid').value === 'si';
+  if (!desc || !val) { alert('Completa descripción y valor'); return; }
+  const extras = getCuotaExtras();
+  extras.unshift({ id: Date.now(), month, desc, cat, val, paid });
+  saveCuotaExtras(extras);
+  document.getElementById('ca-extra-desc').value = '';
+  document.getElementById('ca-extra-val').value = '';
+  const msg = document.getElementById('ca-extra-msg');
+  msg.textContent = '✓ Agregado'; setTimeout(() => msg.textContent = '', 2000);
+  renderCuotaExtras();
+  renderCuotaMetrics();
+}
+
+function deleteCuotaExtra(id) {
+  if (!confirm('¿Eliminar este gasto?')) return;
+  saveCuotaExtras(getCuotaExtras().filter(e => e.id !== id));
+  renderCuotaExtras(); renderCuotaMetrics();
+}
+
+function setCuotaExpected(month, val) {
+  const d = getCuotaData();
+  if (!d[month]) d[month] = { expected: 0, received: 0, note: '' };
+  d[month].expected = +val || 0;
+  saveCuotaData(d);
+  renderCuotaMetrics();
+}
+
+function setCuotaReceived(month, val) {
+  const d = getCuotaData();
+  if (!d[month]) d[month] = { expected: getCuotaEsperada(month), received: 0, note: '' };
+  d[month].received = +val || 0;
+  saveCuotaData(d);
+  renderCuotaMetrics();
+}
+
+function renderCuotaPage() {
+  populateCuotaSelects();
+  renderCuotaTable();
+  renderCuotaMetrics();
+  renderCuotaExtras();
+}
+
+function renderCuotaMetrics() {
+  const d = getCuotaData();
+  const extras = getCuotaExtras();
+  let totalExpected = 0, totalReceived = 0, totalDebt = 0, totalExtras = 0;
+
+  CA_MONTHS.forEach(k => {
+    const entry = d[k] || {};
+    const exp = entry.expected !== undefined ? entry.expected : getCuotaEsperada(k);
+    const rec = entry.received || 0;
+    if (exp > 0) { totalExpected += exp; totalReceived += rec; if (rec < exp) totalDebt += (exp - rec); }
+  });
+  extras.forEach(e => { if (!e.paid) totalExtras += e.val; });
+
+  const pct = totalExpected > 0 ? Math.round(totalReceived / totalExpected * 100) : 0;
+  const color = pct >= 90 ? 'var(--green)' : pct >= 50 ? 'var(--yellow)' : 'var(--red)';
+
+  document.getElementById('ca-metrics').innerHTML = `
+    <div class="metric" style="cursor:default">
+      <div class="metric-label">Total adeudado (cuota)</div>
+      <div class="metric-val r">${fmt(totalDebt)}</div>
+      <div class="metric-sub">de ${fmt(totalExpected)} esperados</div>
+    </div>
+    <div class="metric" style="cursor:default">
+      <div class="metric-label">Total recibido</div>
+      <div class="metric-val g">${fmt(totalReceived)}</div>
+      <div class="metric-sub" style="color:${color}">${pct}% del total esperado</div>
+    </div>
+    <div class="metric" style="cursor:default">
+      <div class="metric-label">Gastos extras pendientes</div>
+      <div class="metric-val y">${fmt(totalExtras)}</div>
+      <div class="metric-sub">${extras.filter(e=>!e.paid).length} ítem(s) sin pagar</div>
+    </div>
+    <div class="metric" style="cursor:default">
+      <div class="metric-label">Deuda total (cuota + extras)</div>
+      <div class="metric-val r">${fmt(totalDebt + totalExtras)}</div>
+      <div class="metric-sub">acumulado desde 2020</div>
+    </div>`;
+}
+
+function renderCuotaTable() {
+  const d = getCuotaData();
+  const todayKey = mkey(now.getFullYear(), now.getMonth());
+
+  // Group by year
+  const years = {};
+  CA_MONTHS.forEach(k => {
+    const y = k.split('-')[0];
+    if (!years[y]) years[y] = [];
+    years[y].push(k);
+  });
+
+  let rows = '';
+  Object.keys(years).sort((a,b) => b-a).forEach(year => {
+    rows += `<tr class="ca-year-header"><td colspan="7" style="padding:10px 10px 6px;font-size:13px;color:var(--text2)">── ${year} ──</td></tr>`;
+    years[year].forEach(k => {
+      const entry = d[k] || {};
+      const expected = entry.expected !== undefined ? entry.expected : getCuotaEsperada(k);
+      const received = entry.received || 0;
+      const diff = received - expected;
+      const isFuture = k > todayKey;
+      const isPast = k < todayKey;
+
+      let badge = '';
+      if (expected === 0 && received === 0) badge = '';
+      else if (isFuture) badge = '<span class="ca-badge future">Futuro</span>';
+      else if (received >= expected && expected > 0) badge = '<span class="ca-badge paid">Pagado</span>';
+      else if (received > 0 && received < expected) badge = '<span class="ca-badge partial">Parcial</span>';
+      else if (expected > 0 && received === 0) badge = '<span class="ca-badge pending">Pendiente</span>';
+
+      const diffClass = diff > 0 ? 'pos' : diff < 0 ? 'neg' : 'zero';
+      const diffText = expected > 0 ? (diff > 0 ? '+' : '') + fmt(diff) : '—';
+
+      rows += `<tr>
+        <td style="font-weight:500;color:var(--text);font-size:12px;white-space:nowrap">${fmtMonth(k)}</td>
+        <td>
+          <input class="ca-input" type="number"
+            value="${expected || ''}"
+            placeholder="${getCuotaEsperada(k) || '0'}"
+            onchange="setCuotaExpected('${k}', this.value)"
+            ${isFuture ? '' : ''}>
+        </td>
+        <td>
+          <input class="ca-input" type="number"
+            value="${received || ''}"
+            placeholder="0"
+            onchange="setCuotaReceived('${k}', this.value)">
+        </td>
+        <td class="ca-diff ${diffClass}" style="font-family:'DM Mono',monospace;font-size:12px">${expected > 0 ? diffText : '—'}</td>
+        <td>${badge}</td>
+        <td style="font-size:11px;color:var(--text3);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${entry.note || ''}</td>
+        <td></td>
+      </tr>`;
+    });
+  });
+
+  document.getElementById('ca-tbody').innerHTML = rows;
+}
+
+function renderCuotaExtras() {
+  const extras = getCuotaExtras();
+  const el = document.getElementById('ca-extras-list');
+  if (!extras.length) { el.innerHTML = '<p class="empty">Sin gastos extras registrados</p>'; return; }
+
+  // show last 10
+  el.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Últimos gastos extras</div>'
+    + extras.slice(0, 15).map(e => `
+      <div class="ca-extra-row">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:500;color:var(--text)">${e.desc} <span style="font-size:10px;color:var(--text3)">${e.cat}</span></div>
+          <div style="font-size:10px;color:var(--text3)">${fmtMonth(e.month)}</div>
+        </div>
+        <div style="text-align:right;margin-right:8px">
+          <div style="font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:${e.paid ? 'var(--green)' : 'var(--red)'}">${fmt(e.val)}</div>
+          <div style="font-size:10px;color:${e.paid ? 'var(--green)' : 'var(--yellow)'}">
+            ${e.paid ? 'Pagado' : 'Pendiente'}
+            <span style="cursor:pointer;color:var(--text3);margin-left:4px" onclick="toggleExtraPaid(${e.id})">⇄</span>
+          </div>
+        </div>
+        <button class="icon-btn del-btn" onclick="deleteCuotaExtra(${e.id})">✕</button>
+      </div>`).join('');
+}
+
+function toggleExtraPaid(id) {
+  const extras = getCuotaExtras();
+  const e = extras.find(x => x.id === id);
+  if (e) { e.paid = !e.paid; saveCuotaExtras(extras); renderCuotaExtras(); renderCuotaMetrics(); }
+}
+
+function downloadCuotaCSV() {
+  const d = getCuotaData();
+  const extras = getCuotaExtras();
+  const headers = ['Mes','Cuota esperada','Recibido','Diferencia','Estado','Nota'];
+  const rows = CA_MONTHS.map(k => {
+    const entry = d[k] || {};
+    const exp = entry.expected !== undefined ? entry.expected : getCuotaEsperada(k);
+    const rec = entry.received || 0;
+    const diff = exp > 0 ? rec - exp : 0;
+    const estado = exp === 0 ? '' : rec >= exp ? 'Pagado' : rec > 0 ? 'Parcial' : 'Pendiente';
+    return [fmtMonth(k), exp||0, rec, exp>0?diff:'', estado, (entry.note||'').replace(/,/g,' ')].join(',');
+  });
+  const extraHeaders = ['','','','','',''];
+  const extraTitle = ['Gastos extras','Mes','Descripcion','Categoria','Valor','Estado'];
+  const extraRows = extras.map(e => ['', fmtMonth(e.month), e.desc.replace(/,/g,' '), e.cat, e.val, e.paid?'Pagado':'Pendiente'].join(','));
+  const allLines = [headers.join(','), ...rows, '', extraTitle.join(','), ...extraRows];
+  const csv = allLines.join('\r\n');
+  const blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='cuota_alimentaria.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+
+// ── CUOTA: Download template ──
+function downloadCuotaTemplate() {
+  const lines = [
+    '# Template de importación — Cuota alimentaria',
+    '# Columnas requeridas: anio,mes,monto_esperado,monto_recibido',
+    '# mes: número del 1 al 12',
+    '# Los montos son en COP sin puntos ni comas',
+    '#',
+    'anio,mes,monto_esperado,monto_recibido',
+    '2020,1,800000,800000',
+    '2020,2,800000,400000',
+    '2020,3,800000,0',
+    '2021,6,950000,950000',
+    '2025,8,1150000,0',
+    '2025,9,1150000,1150000',
+    '2026,1,1414000,0',
+  ];
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'template_cuota_alimentaria.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── CUOTA: Import CSV ──
+function importCuotaCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const msgEl = document.getElementById('ca-import-msg');
+    try {
+      const lines = text.split(/\r?\n/).filter(l => l.trim() && !l.trim().startsWith('#'));
+      if (!lines.length) { msgEl.innerHTML = '<span style="color:var(--red)">El archivo está vacío</span>'; return; }
+
+      // Detect header
+      const firstLine = lines[0].toLowerCase().replace(/\s/g,'');
+      let dataLines = lines;
+      if (firstLine.includes('anio') || firstLine.includes('año') || firstLine.includes('mes') || firstLine.includes('monto')) {
+        dataLines = lines.slice(1); // skip header row
+      }
+
+      const d = getCuotaData();
+      let imported = 0, skipped = 0, errors = [];
+
+      dataLines.forEach((line, idx) => {
+        if (!line.trim()) return;
+        // Clean and split — handle both comma and semicolon separators
+        const sep = line.includes(';') ? ';' : ',';
+        const cols = line.split(sep).map(c => c.trim().replace(/["\']/g, ''));
+        if (cols.length < 3) { skipped++; return; }
+
+        const anio = parseInt(cols[0]);
+        const mes = parseInt(cols[1]);
+        const esperado = parseFloat(cols[2].replace(/[^0-9.-]/g, '')) || 0;
+        const recibido = cols[3] !== undefined ? parseFloat(cols[3].replace(/[^0-9.-]/g, '')) || 0 : 0;
+
+        if (isNaN(anio) || isNaN(mes) || anio < 2000 || anio > 2100 || mes < 1 || mes > 12) {
+          errors.push('Fila ' + (idx + 2) + ': año/mes inválido (' + cols[0] + '/' + cols[1] + ')');
+          skipped++; return;
+        }
+
+        const k = anio + '-' + String(mes).padStart(2, '0');
+        if (!d[k]) d[k] = { expected: 0, received: 0, note: '' };
+        if (esperado > 0) d[k].expected = esperado;
+        if (recibido > 0) d[k].received = recibido;
+
+        // Add month to CA_MONTHS if not present
+        if (!CA_MONTHS.includes(k)) CA_MONTHS.push(k);
+        imported++;
+      });
+
+      // Sort CA_MONTHS
+      CA_MONTHS.sort();
+
+      saveCuotaData(d);
+      input.value = ''; // reset input so same file can be re-imported
+
+      let msg = '<span style="color:var(--green)">✓ ' + imported + ' fila(s) importadas correctamente</span>';
+      if (skipped) msg += ' <span style="color:var(--yellow)">· ' + skipped + ' omitida(s)</span>';
+      if (errors.length) msg += '<br><span style="color:var(--red);font-size:10px">' + errors.slice(0,3).join('<br>') + '</span>';
+      msgEl.innerHTML = msg;
+      setTimeout(() => { msgEl.innerHTML = ''; }, 6000);
+
+      renderCuotaPage();
+    } catch(err) {
+      document.getElementById('ca-import-msg').innerHTML = '<span style="color:var(--red)">Error al leer el archivo: ' + err.message + '</span>';
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
 </script>
 <script>
 const CATS=['Vivienda','Alimentación','Transporte','Salud','Entretenimiento','Ropa','Educación','Suscripciones','Restaurantes','Viajes','Cuota deuda','Inversiones','Otros'];
@@ -849,7 +1322,7 @@ const SOURCE_COLORS={Picap:'#5b8af0','Cuota Lean':'#22c98a','Cuota Isa':'#a78bfa
 const DEST_COLORS={'Ahorros Bancolombia':'#22c98a','Checking RBC':'#2dd4bf','Lulo Ahorros':'#f05c8e','Nu Ahorros':'#a78bfa'};
 const ACC_COLORS={'Ahorros Bancolombia':'#22c98a','Checking RBC':'#2dd4bf','Lulo Ahorros':'#f05c8e','Nu Ahorros':'#a78bfa'};
 const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-const PAGE_TITLES={dashboard:'Dashboard',plan:'Planeación',add:'Nueva Transacción',deudas:'Deudas',ahorros:'Ahorros',fx:'COP / CAD',history:'Historial',budget:'Presupuesto'};
+const PAGE_TITLES={cuota:'Cuota alimentaria',dashboard:'Dashboard',plan:'Planeación',add:'Nueva Transacción',deudas:'Deudas',ahorros:'Ahorros',fx:'COP / CAD',history:'Historial',budget:'Presupuesto'};
 
 let txType='expense', viewYear, viewMonth, planYear, planMonth, savYear, savMonth;
 let currentTRM = 0, trmDate = '';
@@ -932,6 +1405,7 @@ function showPage(id,el){
   if(id==='plan'){renderPlanMonthLabel();renderPlanInputs();renderPlanVs();}
   if(id==='ahorros')renderSavPage();
   if(id==='fx')renderFXPage();
+  if(id==='cuota'){renderCuotaPage();}
 }
 
 // ── TRANSACTION TYPE ──
@@ -1376,11 +1850,11 @@ function renderPlanVs(){
 
 // ── DEBTS ──
 function addDebt(){
-  const name=document.getElementById('d-name').value.trim(),balance=+document.getElementById('d-balance').value;
+  const name=document.getElementById('debt-name').value.trim(),balance=+document.getElementById('debt-balance').value;
   if(!name||!balance){alert('Completa nombre y saldo');return}
   const arr=getDebts();
-  arr.push({id:Date.now(),name,type:document.getElementById('d-type').value,balance,originalBalance:balance,quota:+document.getElementById('d-quota').value||0,rate:+document.getElementById('d-rate').value||0,dueDate:document.getElementById('d-duedate').value,installments:+document.getElementById('d-installments').value||0,note:document.getElementById('d-note').value.trim(),paid:0});
-  saveDebts(arr);['d-name','d-balance','d-quota','d-rate','d-duedate','d-installments','d-note'].forEach(id=>document.getElementById(id).value='');
+  arr.push({id:Date.now(),name,type:document.getElementById('debt-type').value,balance,originalBalance:balance,quota:+document.getElementById('debt-quota').value||0,rate:+document.getElementById('debt-rate').value||0,dueDate:document.getElementById('debt-duedate').value,installments:+document.getElementById('debt-installments').value||0,note:document.getElementById('debt-note').value.trim(),paid:0});
+  saveDebts(arr);['debt-name','debt-balance','debt-quota','debt-rate','debt-duedate','debt-installments','debt-note'].forEach(id=>document.getElementById(id).value='');
   const msg=document.getElementById('debt-save-msg');msg.textContent='✓ Guardado';setTimeout(()=>msg.textContent='',2000);
   renderDebts();renderDashMetrics();
 }
